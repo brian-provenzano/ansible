@@ -12,6 +12,8 @@
 
 - name: a2dissite default
   command: a2dissite 000-default
+  args:
+    removes: /etc/apache2/sites-enabled/000-default.conf
   notify: reload apache
 
 - name: a2ensite ssl

@@ -1,5 +1,16 @@
 ---
+- name: update and upgrade apt packages
+  apt:
+    upgrade: yes
+    force_apt_get: yes
+    update_cache: yes
+
 - name: install htop
   package: 
     name: htop
+    state: present
+
+- name: install git
+  package: 
+    name: git
     state: present
