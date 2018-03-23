@@ -1,4 +1,6 @@
 ---
+#this is all ubuntu/debian specific 
+#TODO - add conditionals here to handle RHEL based distros
 - name: enabled mod_ssl
   apache2_module: name=ssl state=present
   notify: restart apache 

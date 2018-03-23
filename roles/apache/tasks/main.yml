@@ -1,7 +1,16 @@
 ---
+# Load a variable file based on the OS type, or a default if not found.
+- include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+  when: apache_pkgname is not defined
+
 - name: Installs apache web server
   package: 
-    name: apache2
+    name: "{{ apache_pkgname }}"
     state: present
   notify:
     - enable apache 
