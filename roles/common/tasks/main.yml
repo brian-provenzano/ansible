@@ -1,7 +1,5 @@
 ---
-- name: Installs apache web server
+- name: install htop
   package: 
-    name: apache2
+    name: htop
     state: present
-  notify:
-    - start apache
