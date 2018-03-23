@@ -1,0 +1,21 @@
+---
+- name: enabled mod_ssl
+  apache2_module: name=ssl state=present
+  notify: restart apache 
+
+- template:
+    src: ssl.conf
+    dest: /etc/apache2/sites-available/
+    owner: www-data
+    group: www-data
+    mode: '0600'
+
+- name: a2dissite default
+  command: a2dissite 000-default
+  notify: reload apache
+
+- name: a2ensite ssl
+  command: a2ensite ssl
+  args:
+    creates: /etc/apache2/sites-enabled/ssl.conf
+  notify: reload apache

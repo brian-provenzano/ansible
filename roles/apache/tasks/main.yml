@@ -1,0 +1,12 @@
+---
+- name: Installs apache web server
+  package: 
+    name: apache2
+    state: present
+  notify:
+    - enable apache 
+    - start apache
+
+- name: Upload default index.html for host
+  copy: src=default-apache-index.html dest=/var/www/html/index.html mode=0644
+  ignore_errors: True
