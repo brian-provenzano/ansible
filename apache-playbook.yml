@@ -1,5 +1,6 @@
 ---
 - hosts: myawswebservers
   roles:
+    - common
     - apache
     - apache-ssl
