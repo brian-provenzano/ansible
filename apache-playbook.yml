@@ -1,7 +1,8 @@
 ---
+#--For this playbook - only run either "apache-ssl" OR "apachessl-le" (letsencrypt certs) NOT both!!
 - hosts: myawswebservers
   roles:
     - common
     - apache
-    - apache-ssl
-    - certbot-acme
+    #- apache-ssl
+    - apache-ssl-le
