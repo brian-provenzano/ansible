@@ -4,3 +4,4 @@
     - common
     - apache
     - apache-ssl
+    - certbot-acme

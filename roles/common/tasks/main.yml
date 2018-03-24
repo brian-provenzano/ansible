@@ -7,6 +7,7 @@
     verbosity: 4
 
 #TODO - conditionals for RHEL based systems
+#also consider moving this to another role to prevent accidental playbook upgrades...
 - name: update and upgrade apt packages
   apt:
     upgrade: yes

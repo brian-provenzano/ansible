@@ -3,7 +3,6 @@
 #TODO - add conditionals here to handle RHEL based distros
 - name: enabled mod_ssl
   apache2_module: name=ssl state=present
-  notify: restart apache 
 
 - template:
     src: ssl.conf
@@ -12,13 +11,12 @@
     group: www-data
     mode: '0600'
 
-- name: a2dissite default
-  command: a2dissite 000-default
+- name: a2dissite remove all defaults
+  command: a2dissite default
   args:
-    removes: /etc/apache2/sites-enabled/000-default.conf
-  notify: reload apache
+    removes: /etc/apache2/sites-enabled/default.conf
 
-- name: a2ensite ssl
+- name: a2ensite enable our ssl site
   command: a2ensite ssl
   args:
     creates: /etc/apache2/sites-enabled/ssl.conf
