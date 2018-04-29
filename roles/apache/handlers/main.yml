@@ -10,6 +10,9 @@
 
 - name: start apache
   systemd: state=started name={{ apache_srvname }}
+
+- name: reload apache
+  systemd: state=reloaded name={{ apache_srvname }}
   
 - name: enable apache
   systemd:

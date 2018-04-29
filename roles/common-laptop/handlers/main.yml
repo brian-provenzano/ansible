@@ -1,0 +1,6 @@
+---
+# - name: extract repos
+#   command: chdir=/ tar -zxvf current-yumrepos.tar.gz 
+  
+# - name: extract gnomeexts
+#   command: chdir=/home/brianprovenzano/ tar -zxvf current-gnome-exts.tar.gz

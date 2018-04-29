@@ -1,0 +1,151 @@
+---
+# Testing - laptop full restore (laptop DR!!)
+# 
+# TODO - use duplicity restores directly from b2 cloud to handle stuff I am currently
+# handling via tar files and config files in "files" dir of this role
+
+# - name: Display all variables/facts known for a host
+#   debug:
+#     var: hostvars[inventory_hostname]
+#     verbosity: 4
+
+- name: update all packages
+  dnf:
+    name: "*"
+    state: latest
+
+# 1 - Drop gpg key needed to access b2 cloud via duplicity
+- name: copy gpg keys needed
+  copy:
+    src: current-python-pkgs-installed.txt
+    dest: /home/brianprovenzano/current-python-pkgs-installed.txt
+    owner: brianprovenzano
+    group: brianprovenzano
+    mode: 0660
+
+/home/brianprovenzano/.gnupg
+
+
+# #TODO - replace this with unarchive module
+# - name: copy yum repo dir tar.gz file
+#   copy:
+#     src: current-yumrepos.tar.gz
+#     dest: /
+#     owner: root
+#     group: root
+#     mode: 0700
+#   notify:
+#     - extract repos
+
+# (this tar contains .local/share/gnome-shell/extensions from backup)
+- name: Extract and copy etc yum repos directory 
+  unarchive:
+    src: current-yumrepos.tar.gz
+    dest: /
+
+
+#dnf module doesnt handle this currently AFAIK
+- name: run dnf check-update to update cache and confirm keys
+  command: dnf check-update -y
+  args:
+    warn: false # set warn=false to prevent warning about dnf usage
+
+- name: copy rpm file
+  copy:
+    src: current-rpm-pkgs-installed.txt
+    dest: /home/brianprovenzano/current-rpm-pkgs-installed.txt
+    owner: brianprovenzano
+    group: brianprovenzano
+    mode: 0660
+  
+- name: copy py file
+  copy:
+    src: current-python-pkgs-installed.txt
+    dest: /home/brianprovenzano/current-python-pkgs-installed.txt
+    owner: brianprovenzano
+    group: brianprovenzano
+    mode: 0660
+
+- name: copy py3 file
+  copy:
+    src: current-python3-pkgs-installed.txt
+    dest: /home/brianprovenzano/current-python3-pkgs-installed.txt
+    owner: brianprovenzano
+    group: brianprovenzano
+    mode: 0660
+
+- name: copy dconf for Gnome settings
+  copy:
+    src: current-dconf-org.gnome-installed.txt
+    dest: /home/brianprovenzano/current-dconf-org.gnome-installed.txt
+    owner: brianprovenzano
+    group: brianprovenzano
+    mode: 0660
+
+- name: get list of pkgs to install from file
+  command: cat /home/brianprovenzano/current-rpm-pkgs-installed.txt
+  register: my_pkgs
+
+- name: get list of py pkgs to install from file
+  command: cat /home/brianprovenzano/current-python-pkgs-installed.txt
+  register: my_py_pkgs
+
+- name: get list of py3 pkgs to install from file
+  command: cat /home/brianprovenzano/current-python3-pkgs-installed.txt
+  register: my_py3_pkgs
+
+#- debug: var=my_pkgs.stdout_lines
+
+- name: Installs all pkgs for custom laptop setup
+  dnf:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ my_pkgs.stdout_lines }}"
+
+
+#install these via rpms manually- brother rpm, zoom :
+# hll2340dcupswrapper.i386
+# hll2340dlpr.i386
+# zoom.x86_64
+
+- name: install these items pip
+  become: yes
+  become_user: brianprovenzano
+  pip: 
+    name: "{{ item }}"
+    extra_args: --user
+    executable: pip
+  with_items: "{{ my_py_pkgs.stdout_lines }}"
+
+- name: install these items pip3
+  become: yes
+  become_user: brianprovenzano
+  pip: 
+    name: "{{ item }}"
+    extra_args: --user
+    executable: pip3
+  with_items: "{{ my_py3_pkgs.stdout_lines }}"
+
+# restore dconf settings....
+- name: restore dconf settings for gnome for brianprovenzano user
+  become: yes
+  become_user: brianprovenzano
+  command: dconf load /org/gnome/ < current-dconf-org.gnome-installed.txt
+  args:
+    chdir: /home/brianprovenzano
+
+# (this tar contains .local/share/gnome-shell/extensions from backup)
+- name: Extract and copy gnome extensions tar.gz file
+  become: yes
+  become_user: brianprovenzano
+  unarchive:
+    src: current-gnome-exts.tar.gz
+    dest: /home/brianprovenzano/.local/share/gnome-shell
+
+#TODO ---copy .dotfiles / home - from duplicity
+
+#TODO -also pick thru /etc backup for restorable customization files (diff it maybe)
+#---restore all user and cron.d cron jobs
+
+
+
